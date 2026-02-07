@@ -137,7 +137,7 @@ def main():
             sprite.draw(screen)
 
         score_text = font.render(f"Score: {score}", True, "white")
-        time_text = font.render(f"Time: {format_time(elapsed_time)}", True, "red")
+        time_text = font.render(f"Time: {format_time(elapsed_time)}", True, "yellow")
         screen.blit(score_text, (10, 10))
         screen.blit(time_text, (10, 50))
 
