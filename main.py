@@ -104,6 +104,12 @@ def main():
                 high_scores = load_high_scores()
 
                 print("\n" + "="*50)
+                print("GAME OVER!")
+                print("="*50)
+                print(f"Your Score: {score}")
+                print(f"Time Survived: {format_time(elapsed_time)}")
+                print()
+
                 if rank:
                     print(f"🎉 NEW HIGH SCORE! You are #{rank} on the Leaderboard! 🎉")
                     print()
