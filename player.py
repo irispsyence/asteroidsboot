@@ -1,17 +1,17 @@
 import pygame
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN_SECONDS, SHOT_RADIUS
 from circleshape import CircleShape
-from constants import PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED, SHOT_RADIUS, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN_SECONDS 
 from shot import Shot
 
-
 class Player(CircleShape):
-    
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
-        self.shoot_cooldown = 0.0
+        self.shoot_timer = 0
+        self.game_mode = None  # Will be set by main.py for special modes
+        self.shots_remaining = None  # Will be set for One In The Chamber mode
+        self.can_shoot = True
 
-    # in the Player class
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -21,45 +21,43 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen):
-        pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
+        pygame.draw.polygon(screen, "white", self.triangle(), 2)
 
     def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt 
+        self.rotation += PLAYER_TURN_SPEED * dt
 
     def update(self, dt):
-        if self.shoot_cooldown > 0:
-            self.shoot_cooldown -= dt
-            if self.shoot_cooldown < 0:
-                self.shoot_cooldown = 0
-
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
             self.rotate(-dt)
         if keys[pygame.K_d]:
             self.rotate(dt)
-        
         if keys[pygame.K_w]:
             self.move(dt)
         if keys[pygame.K_s]:
-            self.move(dt)
-
-        if keys[pygame.K_SPACE]:
-            self.shoot()
+            self.move(-dt)
+        
+        # Only auto-shoot in non-One In The Chamber modes
+        if self.game_mode != "one_in_chamber":
+            if keys[pygame.K_SPACE]:
+                self.shoot()
+        
+        # Update shoot cooldown timer
+        if self.shoot_timer > 0:
+            self.shoot_timer -= dt
+            self.can_shoot = False
+        else:
+            self.can_shoot = True
 
     def move(self, dt):
-        unit_vector = pygame.Vector2(0, 1)
-        rotated_vector = unit_vector.rotate(self.rotation)
-        rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
-        self.position += rotated_with_speed_vector
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        self.position += forward * PLAYER_SPEED * dt
 
     def shoot(self):
-        if self.shoot_cooldown > 0:
+        if self.shoot_timer > 0:
             return
-
+        
         shot = Shot(self.position.x, self.position.y, SHOT_RADIUS)
         shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
-
-        self.shoot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
-
-
+        self.shoot_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
