@@ -11,7 +11,7 @@ from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 
-HIGH_SCORES_FILE = "high_scores.json"
+HIGH_SCORES_FILE = "high_scores_v2.json"
 
 def load_high_scores():
     """Load high scores from file, return empty dict with mode keys if file doesn't exist"""
