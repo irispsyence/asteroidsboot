@@ -14,6 +14,7 @@ wheels/
 game_state.jsonl
 game_events.jsonl
 high_scores.json
+high_scores_v2.json
 
 # OS
 .DS_Store
